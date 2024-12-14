@@ -25,7 +25,7 @@ public class CardsDirector : MonoBehaviour
     //ƒVƒƒƒbƒtƒ‹
     public void ShuffleCards(List<CardController> cards)
     {
-        Debug.Log("Card.Count "+cards.Count);
+        Debug.Log("ShuffkeCards, Card.Count "+cards.Count);
         for(int i= 0; i < cards.Count; i++)
         {
             int rnd = Random.Range(0, cards.Count);
