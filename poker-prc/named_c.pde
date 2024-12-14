@@ -1,3 +1,4 @@
+
 //表示カードタブ
 int p1_card[] = new int[7]; //プレイヤー１の手札
 int p2_card[] = new int[7]; //プレイヤー２の手札
@@ -72,3 +73,4 @@ int nums=0;
 int open_card[]=new int[7];
 boolean mark_thr=false;
 boolean mark_two=false;
+

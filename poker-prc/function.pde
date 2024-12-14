@@ -51,6 +51,27 @@ void card_text(int i) {
   text(r, card_x[i]+20, card_y[i]+70);
 }
 
+void dif_check() {
+  check=0;
+  k=0;
+  while (check==0) {
+    for (int i=0; i<7; i++) {
+      for (int j=i+1; j<7; j++) {
+        if (card_num[i]==card_num[j]) {
+          k=1;
+          card_num[i]++;
+          if (card_num[i]>=52) {
+            card_num[i]=0;
+          }
+        }
+      }
+    }
+    if (k==0) {
+      check=1;
+    }
+    k=0;
+  }
+}
 
 void card_change() {
   int t = 0;
@@ -67,6 +88,7 @@ void card_change() {
       card_check[i] = 0;
     }
   }
+
   int check = 0;
   int k = 0;
   //無限周期による被りがないかの全探索
@@ -77,6 +99,7 @@ void card_change() {
         for (int j = 1; j < all_card_num.length; j++) {
           if (i + j >= 14) {
             t = j - 14;
+
           } else {
             t = j;
           }
@@ -127,9 +150,11 @@ void submit() {
 
     support_strong=0;
     support_num=int(random(9))+1;
+
     support_count++;
 
     if (support_count>6) {
+
       show_number=1;
       support_change=true;
       for (int i=0; i<7; i++) {
@@ -140,16 +165,17 @@ void submit() {
         }
       }
     } else {
+
       support_card[support_count-1]=1;
       //support_card[support_count-1]=support_strong*100+support_num;
+
     }
     break;
   case 2:
     support_strong=0;
     for (int i=0; i<2; i++) {
-      support_count++;
       support_num=int(random(9))+1;
-      if (support_count>6) {
+      if (support_count>=6) {
         show_number=1;
         support_change=true;
         for (int k=0; k<8; k++) {
@@ -160,15 +186,18 @@ void submit() {
           }
         }
       } else {
-        support_card[support_count-1]=support_strong*100+support_num;
+        support_card[support_count]=support_strong*100+support_num;
+        support_count++;
       }
     }
     break;
   case 3:
     support_strong=1;
+
     support_count++;
     support_num=int(random(11))+1;
     if (support_count>6) {
+
       show_number=1;
       support_change=true;
       for (int i=0; i<7; i++) {
@@ -179,7 +208,8 @@ void submit() {
         }
       }
     } else {
-      support_card[support_count-1]=support_strong*100+support_num;
+      support_card[support_count]=support_strong*100+support_num;
+      support_count++;
     }
     break;
   case 4:
@@ -201,10 +231,12 @@ void submit() {
     }
     break;
   case 6:
+
     support_strong=2;
     support_count++;
     support_num=int(random(11))+1;
     if (support_count>6) {
+
       show_number=1;
       support_change=true;
       for (int i=0; i<7; i++) {
@@ -215,14 +247,17 @@ void submit() {
         }
       }
     } else {
-      support_card[support_count-1]=support_strong*100+support_num;
+      support_card[support_count]=support_strong*100+support_num;
+      support_count++;
     }
     break;
   case 7:
     support_strong=2;
+
     support_count++;
     support_num=int(random(4))+1;
     if (support_count>6) {
+
       show_number=1;
       support_change=true;
       for (int i=0; i<7; i++) {
@@ -233,7 +268,8 @@ void submit() {
         }
       }
     } else {
-      support_card[support_count-1]=support_strong*100+support_num;
+      support_card[support_count]=support_strong*100+support_num;
+      support_count++;
     }
     break;
   case 5:

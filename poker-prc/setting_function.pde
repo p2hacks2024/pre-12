@@ -1,8 +1,10 @@
 //セットアップ
 void setting(int card[]) {
+
   for(int i=0;i<4;i++){
     which_mark[i]=4;
   }
+
   for (int i = 0; i<card.length; i++) {/*カード配布とカード配置とカードチェックの初期化*/
     card[i]=int(random(52));
     card_y[i]=420;
