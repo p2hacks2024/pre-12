@@ -12,9 +12,7 @@ void role_check() {
     card_dex[i]=r;
     card_mark[i]=q;
   }
-  for (int i=0; i<13; i++) {
-    num_count[i]=0;
-  }
+
   for (int t=0; t<7; t++) {
     if (card_check[t]!=0) {
       num_count[card_dex[t]]++;

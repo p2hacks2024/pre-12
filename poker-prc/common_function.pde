@@ -2,8 +2,8 @@ void dif_check(int card[]) {
   int check = 0;
   int k = 0;
   while (check == 0) {
-    for (int i = 0 ; i < card.length ; i++) {
-      for (int j = i + 1 ; j < card.length ; j++) {
+    for (int i = 0; i < card.length; i++) {
+      for (int j = i + 1; j < card.length; j++) {
         if (card[i] == card[j]) {
           k = 1;
           card[i] = card[i] + 1;
