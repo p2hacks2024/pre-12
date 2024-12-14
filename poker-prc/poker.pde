@@ -1,12 +1,18 @@
 void setup() {
   size(960, 540);
-  setting(all_card_num);
+  for (int i=0; i<7; i++) {/*カード配布とカード配置とカードチェックの初期化*/
+    card_num[i]=int(random(52));
+    card_y[i]=420;
+    card_check[i]=0;
+  }
+  for (int i=0; i<8; i++) {
+    support_colortag[i]=0;
+  }
+  dif_check();//すべて別の数字への調整
 }
 void draw() {
   background(192, 192, 255);
-  textSize(40);
-  fill(0);
-  text(which_player,830,400);
+
   //ここからヘルプ表示
   fill(255, 60);
   rect(0, 25, 50, 75);
@@ -104,7 +110,7 @@ void draw() {
           textSize(30);
           text(support_serect[i], 180+120*(i-4), 130);
         }
-        if (support_count-serect_count<=6) {
+        if (support_count-serect_count<6) {
           deleat_tag=true;
           fill(230);
           rect(750, 100, 150, 75);
@@ -172,15 +178,12 @@ void mousePressed() {
         change_count++;
       }
       support_colortag[i]=0;
-      support_serect[i]=0;
     }
-    serect_count=0;
     add_count=0;
     change_count=0;
     deleat_tag=false;
     support_change=false;
     serect_card=0;
     show_number=0;
-    support_count=6;
   }
 }

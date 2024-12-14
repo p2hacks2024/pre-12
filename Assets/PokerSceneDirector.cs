@@ -1,8 +1,10 @@
 using DG.Tweening;
+using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class PokerSceneDirector : MonoBehaviour
 {
@@ -18,16 +20,24 @@ public class PokerSceneDirector : MonoBehaviour
     Text textButtonChange;
     //全カード
     List<CardController> cards;
+    // Featured Cards
+    public int[] FeaturedCardsLowHand = new int[2];
+    public int[] FeaturedCardsMidHand = new int[2];
+    public int[] FeaturedCardsHighHand = new int[2];
+    public int LowNumber = 0;
+    public int MidNumber = 0;
+    public int HighNumber = 0;
     //手札
     List<CardController> hand;
     //交換するカード
     List<CardController> selectCards;
     //山札のインデックス番号（山札から何枚とったか）
-    int dealCardCount;
+    int dealCardCount = 0;
     //プレイヤーの持ちコイン
     [SerializeField] int playerCoin;
     //交換出来る回数
-    [SerializeField] int cardChangeCountMax;
+    //[SerializeField] int cardChangeCountMax;
+    public int cardChangeCountMax = 100;
     //ベットしたコイン
     int betCoin;
     //交換した回数
@@ -41,6 +51,10 @@ public class PokerSceneDirector : MonoBehaviour
     int threeCardRate = 3;    
     int twoPairRate = 2;      
     int onePairRate = 1;
+    //Players hand's amount
+    public int[] PlayersHandLength = new int[2];
+    //round count
+    public int[] RoundCount = new int[2];
     //アニメーション時間
     const float SortHandTime = 0.5f;
 
@@ -78,13 +92,29 @@ public class PokerSceneDirector : MonoBehaviour
                 setSelectCard(card);
             }
         }
+        if (Input.GetKeyDown(KeyCode.B)) // press B for adding a card to hand
+        {
+            AddHandLength();
+            sortHand();
+        }
+        else if (Input.GetKeyDown(KeyCode.N)) // press N for reset RoundConut
+        {
+            RoundCount[0] = 0; 
+            RoundCount[1] = 0;
+        }
+        else if (Input.GetKeyDown(KeyCode.H)) // press H for reset PlayersHandLength
+        {
+            PlayersHandLength[0] = 0;
+            PlayersHandLength[1] = 0;
+        }
     }
     //手札を加える
     CardController addHand()
     {   //山札からカードを取得してインデックスを進める
-        CardController card = cards[dealCardCount++];
+        CardController card = cards[0]; // CardController card = cards[dealCardCount++]
         //手札に加える
         hand.Add(card);
+        cards.Remove(card);
         //引いたカードを返す
         return card;
         
@@ -97,14 +127,25 @@ public class PokerSceneDirector : MonoBehaviour
             .OnComplete(() => { card.FlipCard(); });//アニメが終わった後に呼び出す関数です
     }
 
+    
+    void AddHandLength()
+    {
+        if (PlayersHandLength[0] < 9)
+        {
+            Debug.Log("HandLength is added");
+            PlayersHandLength[0]++;
+            openHand(addHand());
+        }
+    }
     //手札を並べる
     void sortHand()
     {   //初期位置
-        float x = -CardController.Width * 2;
+        float x = -CardController.Width * (PlayersHandLength[0] / 2);
+        Debug.Log("PlayersHandLength"+PlayersHandLength[0]);
         //手札を枚数分並べる
         foreach (var item in hand) //５枚あるので5回
         {//表示位置へアニメーションして移動
-            Vector3 pos = new Vector3(x, 0, 0); //この座標に移動
+            Vector3 pos = new Vector3(x, 0, -0.2f); //この座標に移動
             item.transform.DOMove(pos, SortHandTime); //SortHandTime秒かけて移動するよ
             //次回の表示位置x
             x += CardController.Width;
@@ -133,13 +174,22 @@ public class PokerSceneDirector : MonoBehaviour
             //裏向きにする
             item.FlipCard(false);
             //山札の場所へ
-            item.transform.position = new Vector3(0, 0, 0.18f);
+            item.transform.position = new Vector3(0, 0, 0);
         }
         //ここから下は配る処理
         if (!deal) return;
 
+        // プレイヤーの手札の数を７枚に初期化とか
+        for (int i = 0; i < 2; i++)
+        {
+            // 手札の数はラウンドごとに変えるようにして、ラウンド取得数はゲームごとに変える
+            PlayersHandLength[i] = 7;
+            RoundCount[i] = 0;
+        }
+
+
         //7枚配って表向きにする
-        for(int i = 0; i < 7; i++)
+        for(int i = 0; i < PlayersHandLength[0] ; i++)
         {
             openHand(addHand());//手札に加えてオープンする
         }
@@ -150,9 +200,10 @@ public class PokerSceneDirector : MonoBehaviour
     //レート表を更新
     void updateTexts()
     {
+        
         textButtonBetCoin.text = "手持ちコイン" + playerCoin;
         textGameInfo.text = "BET枚数" + betCoin;
-
+        /*
         textRate.text = "ストレートフラッシュ" + (straightFlushRate * betCoin) + "\n"
         + "フォーカード" + (fourCardRate * betCoin) + "\n"
         + "フルハウス" + (fullHouseRate * betCoin) + "\n"
@@ -160,6 +211,7 @@ public class PokerSceneDirector : MonoBehaviour
         + "スリーカード" + (threeCardRate * betCoin) + "\n"
         + "ツーペア" + (twoPairRate * betCoin) + "\n"
         + "ワンペア" + (onePairRate * betCoin) + "\n";
+        */
     } 
     
     //ゲーム中のボタンを表示する
@@ -176,6 +228,7 @@ public class PokerSceneDirector : MonoBehaviour
     //コインをベットする
     public void OnClickBetCoin()
     {
+        Debug.Log("BetButton is clicked");
         if (1 > playerCoin) return;
         //コインを減らしてテキストを更新
         playerCoin--; 
@@ -186,6 +239,7 @@ public class PokerSceneDirector : MonoBehaviour
     //ゲームプレイボタン
     public void OnClickPlay()
     {
+        Debug.Log("PlayButton is clicked");
         //デッキと手札を初期化
         restartGame();
         //ゲーム中のボタンとテキストの更新
@@ -208,8 +262,9 @@ public class PokerSceneDirector : MonoBehaviour
             pos.z -= 0.02f;
             selectCards.Remove(card);
         }
-        //選択状態（カード上限を超えないように）
-        else if(cards.Count > dealCardCount + selectCards.Count)
+        //選択状態（カード上限を超えないように） 
+        //else if(cards.Count > dealCardCount + selectCards.Count) // tabun kore tigau
+        else
         {
             pos.z += 0.02f;
             selectCards.Add(card);
@@ -229,6 +284,10 @@ public class PokerSceneDirector : MonoBehaviour
     //カード交換
     public void OnClickChange()
     {
+        foreach (var i in cards) // YOUKAKUNIN
+        {
+            //Debug.Log("cards"+i);
+        }
         //交換しないなら1回で終了
         if(1 > selectCards.Count)
         {
@@ -237,11 +296,14 @@ public class PokerSceneDirector : MonoBehaviour
         //捨てカードを手札から削除
         foreach(var item in selectCards)
         {
+            //Debug.Log("selectCards"+item);
             item.gameObject.SetActive(false); //非表示にする
-            hand.Remove(item);
-            //捨てた分カードを追加
-            openHand(addHand());
+            cards.Add(item);// 山札に追加する
+            hand.Remove(item);// 手札から消す
+            openHand(addHand());//捨てたらカードを追加
         }
+        // cardsDirector.ShuffleCards(cards); // maybe this is wrong
+        Debug.Log("card.count "+ cards.Count);
 
         selectCards.Clear();
         //並べる
@@ -373,43 +435,52 @@ public class PokerSceneDirector : MonoBehaviour
         {
             addcoin = straightFlushRate * betCoin;
             infotext = "ストレートフラッシュ！！";
+            RoundCount[0] += 2;
         }
         else if (fourcard)
         {
             addcoin = fourCardRate * betCoin;
             infotext = "フォーカード";
+            HighNumber = 1;
         }
         else if (fullhouse)
         {
             addcoin = fullHouseRate * betCoin;
             infotext = "フルハウス!!";
+            HighNumber = 1;
         }
         else if (flush)
         {
             addcoin = flushRate * betCoin;
             infotext = "フラッシュ！！";
+            RoundCount[0] += 1;
         }
         else if (straight)
         {
             addcoin = straightRate * betCoin;
             infotext = "ストレート！！";
+            MidNumber = 1;
         }
         else if (threecard)
         {
             addcoin = threeCardRate * betCoin;
             infotext = "スリーカード！！";
+            MidNumber = 1;
         }
         else if (2 == pair)
         {
             addcoin = twoPairRate * betCoin;
             infotext = "ツーペア！！";
+            LowNumber = 2;
         }
         else if (1 == pair)
         {
             addcoin = onePairRate * betCoin;
             infotext = "ワンペア！！";
+            LowNumber = 1;
         }
 
+        Debug.Log("RonundCount"+RoundCount[0]);
         //コイン取得
         playerCoin += addcoin;
 
@@ -420,5 +491,29 @@ public class PokerSceneDirector : MonoBehaviour
         //次回のゲーム用
         betCoin = 0;
         setButtonsInPlay(false);
+
+        ChooseFeaturedCards();
+    }
+
+    void ChooseFeaturedCards()
+    {
+        for (int i = 0; i < LowNumber; i++)
+        {
+            int rnd = Random.Range(0, 9);
+            FeaturedCardsLowHand[0] = rnd;
+        }
+        for (int i = 0; i < MidNumber; i++)
+        {
+            int rnd = Random.Range(0, 14);
+            FeaturedCardsMidHand[0] = rnd;
+        }
+        for (int i = 0; i < HighNumber; i++)
+        {
+            int rnd = Random.Range(0, 7);
+            FeaturedCardsHighHand[0] = rnd;
+        }
+        LowNumber = 0;
+        MidNumber = 0;
+        HighNumber = 0;
     }
 }
