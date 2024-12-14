@@ -1,5 +1,6 @@
 void setup() {
   size(960, 540);
+
   setting(all_card_num);
   Title = loadImage("TitleFlush.png");
   Rule = loadImage("ルール .png");
@@ -41,6 +42,7 @@ void draw() {
       text("Yes", 310, 270);
       text("No", 610, 270);
     }
+
 
 
     //ここからヘルプ表示
@@ -148,6 +150,7 @@ void draw() {
             textSize(40);
             text("deleat", 775, 150);
           }
+
         }
       }
     }
@@ -200,7 +203,6 @@ void draw() {
     text(win_point_p2, 530, 380);
   }
 }
-
 
 //画面選択
 void mousePressed() {
@@ -278,6 +280,7 @@ void mousePressed() {
     if (750<=mouseX && mouseX<=900 && 175<=mouseY && mouseY<=250 && show_number==0) {
       submit();
     }
+
 
     //サポートカードの表示（消し）
     if (25<=mouseX && mouseX<135 && 50<=mouseY && mouseY<=120 && show_number==1 && !support_change) {
@@ -381,5 +384,11 @@ void mousePressed() {
     if (380<=mouseX && 200<=mouseY&& 580>=mouseX && 300>=mouseY) {
       scene=0;
     }
+    add_count=0;
+    change_count=0;
+    deleat_tag=false;
+    support_change=false;
+    serect_card=0;
+    show_number=0;
   }
 }
