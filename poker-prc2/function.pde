@@ -6,6 +6,7 @@ void card(int i) {
     card_y[i]-=40;
     mouse_press=false;
     card_check[i]=1;
+    up_card++;
   }
 
   //選択解除された時の表示
@@ -13,6 +14,7 @@ void card(int i) {
     card_y[i]+=40;
     mouse_press=false;
     card_check[i]=0;
+    up_card--;
   }
 
   //カードが画面外に行かないための制限（使用はしてない）
@@ -51,43 +53,58 @@ void card_text(int i) {
 
 
 void card_change() {
-  int t=0;
-  for (int i=0; i<7; i++) {
-    if (card_check[i]==1) {
-      card_num[i]=int(random(52));
-      card_y[i]=420;
+  int t = 0;
+  for (int i = 0; i < 7; i++) {
+    if (card_check[i] == 1) {
+      card_num[i] = int(random(52));
+      card_y[i] = 420;
+    }
+    if (which_player == 1) {
+      all_card_num[i] = card_num[i];
+    } else {
+      card_check[i+7] = card_check[i];
+      all_card_num[i+7] = card_num[i];
+      card_check[i] = 0;
     }
   }
-  int check=0;
-  int k=0;
-  while (check==0) {
-    for (int i=0; i<7; i++) {
-      if (card_check[i]==1) {
-        change_flag[i]=0;
-        for (int j=1; j<7; j++) {
-          if (i+j>=7) {
-            t=j-7;
+  int check = 0;
+  int k = 0;
+  //無限周期による被りがないかの全探索
+  while (check == 0) {
+    for (int i = 0; i < all_card_num.length; i++) {
+      if (card_check[i] == 1) {
+        change_flag[i] = 0;
+        for (int j = 1; j < all_card_num.length; j++) {
+          if (i + j >= 14) {
+            t = j - 14;
           } else {
-            t=j;
+            t = j;
           }
-          if (card_num[i]==card_num[i+t]) {
-            k=1;
-            card_num[i]++;
-            change_flag[i]=1;
-            if (card_num[i]>=52) {
-              card_num[i]=0;
+          if (all_card_num[i] == all_card_num[i+t]){
+            k = 1;
+            all_card_num[i] = all_card_num[i] + 1;
+            change_flag[i] = 1;
+            if (all_card_num[i] > 52) {
+              all_card_num[i] = 0;
             }
           }
         }
       }
-      if (change_flag[i]==0) {
-        card_check[i]=0;
+      if (change_flag[i] == 0) {
+        card_check[i] = 0;
       }
     }
-    if (k==0) {
-      check=1;
+    if (k == 0) {
+      for (int i = 0; i < 7; i++) {
+        if (which_player == 1) {
+          card_num[i] = all_card_num[i];
+        } else {
+          card_num[i] = all_card_num[i+7];
+        }
+        check = 1;
+      }
+      k = 0;
     }
-    k=0;
   }
 }
 
@@ -95,23 +112,23 @@ void card_change() {
 void submit() {
   //役の判定
   role_check();
-  
+
   //役の判定、妨害カードの配布
   switch(role) {
   case 1:
-  //ここは実験
-  /*for(int i=0;i<8;i++){
+    //ここは実験
+    /*for(int i=0;i<8;i++){
+     support_strong=0;
+     add_count=2;
+     support_num=int(random(9))+1;
+     support_card[support_count]=support_strong*100+support_num;
+     support_count++;
+     }*/
+
     support_strong=0;
-    add_count=2;
-    support_num=int(random(9))+1;
-    support_card[support_count]=support_strong*100+support_num;
-    support_count++;
-  }*/
-  
-    support_strong=0;
     support_num=int(random(9))+1;
     support_count++;
-    
+
     if (support_count>6) {
       show_number=1;
       support_change=true;
@@ -119,12 +136,12 @@ void submit() {
         if (i<6) {
           support_serect[i]=support_card[i];
         } else {
-          add_count++;
           support_serect[i]=support_strong*100+support_num;
         }
       }
     } else {
-      support_card[support_count-1]=support_strong*100+support_num;
+      support_card[support_count-1]=1;
+      //support_card[support_count-1]=support_strong*100+support_num;
     }
     break;
   case 2:
@@ -139,7 +156,6 @@ void submit() {
           if (k<6) {
             support_serect[k]=support_card[k];
           } else {
-            add_count++;
             support_serect[k]=support_strong*100+support_num;
           }
         }
@@ -151,7 +167,7 @@ void submit() {
   case 3:
     support_strong=1;
     support_count++;
-    support_num=int(random(13))+1;
+    support_num=int(random(11))+1;
     if (support_count>6) {
       show_number=1;
       support_change=true;
@@ -159,7 +175,6 @@ void submit() {
         if (i<6) {
           support_serect[i]=support_card[i];
         } else {
-          add_count++;
           support_serect[i]=support_strong*100+support_num;
         }
       }
@@ -168,11 +183,9 @@ void submit() {
     }
     break;
   case 4:
-    break;
-  case 6:
     support_strong=1;
     support_count++;
-    support_num=int(random(15))+1;
+    support_num=int(random(11))+1;
     if (support_count>6) {
       show_number=1;
       support_change=true;
@@ -180,7 +193,24 @@ void submit() {
         if (i<6) {
           support_serect[i]=support_card[i];
         } else {
-          add_count++;
+          support_serect[i]=support_strong*100+support_num;
+        }
+      }
+    } else {
+      support_card[support_count-1]=support_strong*100+support_num;
+    }
+    break;
+  case 6:
+    support_strong=2;
+    support_count++;
+    support_num=int(random(11))+1;
+    if (support_count>6) {
+      show_number=1;
+      support_change=true;
+      for (int i=0; i<7; i++) {
+        if (i<6) {
+          support_serect[i]=support_card[i];
+        } else {
           support_serect[i]=support_strong*100+support_num;
         }
       }
@@ -191,7 +221,7 @@ void submit() {
   case 7:
     support_strong=2;
     support_count++;
-    support_num=int(random(7))+1;
+    support_num=int(random(4))+1;
     if (support_count>6) {
       show_number=1;
       support_change=true;
@@ -199,7 +229,6 @@ void submit() {
         if (i<6) {
           support_serect[i]=support_card[i];
         } else {
-          add_count++;
           support_serect[i]=support_strong*100+support_num;
         }
       }
@@ -208,13 +237,25 @@ void submit() {
     }
     break;
   case 5:
-    win_point+=1;
+    if (which_player==1) {
+      win_point_p1+=1;
+    } else {
+      win_point_p2+=1;
+    }
     break;
   case 8:
-    win_point+=2;
+    if (which_player==1) {
+      win_point_p1+=2;
+    } else {
+      win_point_p2+=2;
+    }
     break;
   case 9:
-    win_point+=3;
+    if (which_player==1) {
+      win_point_p1+=3;
+    } else {
+      win_point_p2+=3;
+    }
     break;
   }
   card_change();
@@ -227,7 +268,7 @@ void show_support() {
 
 void card_support(int i) {
   //カードが選択されたときの表示
-  if (mouse_press && support_colortag[i]==0 && serect_count<add_count) {
+  if (mouse_press && support_colortag[i]==0 && support_count-serect_count>6) {
     mouse_press=false;
     support_colortag[i]=1;
     serect_count++;

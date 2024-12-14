@@ -46,12 +46,12 @@ void role_check() {
     }
   }
   textSize(30);
-  if (num_count[9]>0 && num_count[10]>0 && num_count[11]>0 && num_count[12]>0 && num_count[0]>0 && five_mark) {
+  if (num_count[9]>0 && num_count[10]>0 && num_count[11]>0 && num_count[12]>0 && num_count[0]>0 && five_mark &&!no_all_flush) {
     //print("Royal Straight Flush!");
     card_role=true;
     role=9;
     text("Royal Straight Flush", 350, 350);
-  } else if (straight>=5 && five_mark) {
+  } else if (straight>=5 && five_mark &&!no_all_flush) {
     //print("Straight flush!");
     card_role=true;
     role=8;
@@ -66,7 +66,7 @@ void role_check() {
     card_role=true;
     role=6;
     text("Full House", 450, 350);
-  } else if (five_mark) {
+  } else if (five_mark && !no_flush &&!no_all_flush) {
     //print("Flush!");
     card_role=true;
     role=5;

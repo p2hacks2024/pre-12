@@ -1,4 +1,4 @@
-void setup() {
+void setup() { //<>//
   size(960, 540);
   setting(all_card_num);
 }
@@ -6,7 +6,32 @@ void draw() {
   background(192, 192, 255);
   textSize(40);
   fill(0);
-  text(which_player,830,400);
+  text(which_player, 830, 400);
+  /*for (int j=0; j<13; j++) {
+   fill(255);
+   rect(120+60*j, 220, 40, 40);
+   fill(0);
+   textSize(20);
+   text(j+1, 140+60*j, 250);
+   }*/
+  for (int i=0; i<7; i++) {
+    fill(155);
+    rect(250 + 100 * i, 0, 80, 120);
+  }
+  //ターン終了ボタンの位置
+  fill(255);
+  rect(845, 420, 100, 100);
+  fill(0);
+  text("End", 860, 470);
+  if (end_button==true) {
+    fill(255);
+    rect(260, 210, 150, 100);
+    fill(255, 0, 0);
+    rect(560, 210, 150, 100);
+    fill(0);
+    text("Yes", 310, 270);
+    text("No", 610, 270);
+  }
   //ここからヘルプ表示
   fill(255, 60);
   rect(0, 25, 50, 75);
@@ -38,7 +63,7 @@ void draw() {
   //カード表示ここまで
 
   //ここからカードの使用の選択し表示
-  if (card_check[0]==1 || card_check[1]==1 || card_check[2]==1 || card_check[3]==1 || card_check[4]==1 || card_check[5]==1 || card_check[6]==1 ) {
+  if ((card_check[0]==1 || card_check[1]==1 || card_check[2]==1 || card_check[3]==1 || card_check[4]==1 || card_check[5]==1 || card_check[6]==1 )&& !opp_card_chan) {
     if (card_role) {
       fill(0, 60);
       rect(750, 175, 150, 75);
@@ -68,7 +93,7 @@ void draw() {
   role_check();//役の確認・表示
 
   //役の表示部分
-  if (show_number==1) {
+  if (show_number==1 && use_card==0) {
     show_support();
     fill(255);
     if (!support_change) {
@@ -116,71 +141,6 @@ void draw() {
     }
   }
   //ここまで
-}
-
-//画面選択
-void mousePressed() {
-
-  //カード選択
-  for (int i=0; i<7; i++) {
-    if (!support_change && show_number==0) {
-      if ((card_x[i]<=mouseX && mouseX<=card_x[i]+80)&&(card_y[i]<=mouseY && mouseY<=card_y[i]+120)) {
-        mouse_press=true;
-        serect_card=i;
-      }
-    }
-  }
-  //ここまで
-
-  //カードの引き直し部分
-  if (750<=mouseX && mouseX<=900 && 270<=mouseY && mouseY<=345) {
-    card_change();
-  }
-
-  //役の確定
-  if (750<=mouseX && mouseX<=900 && 175<=mouseY && mouseY<=250) {
-    submit();
-  }
-
-  //サポートカードの表示（消し）
-  if (25<=mouseX && mouseX<135 && 50<=mouseY && mouseY<=120 && show_number==1 && !support_change) {
-    show_number=0;
-  }
-
-  //サポートカードの表示（付け）
-  if (25<=mouseX && mouseX<=95 && 380<=mouseY && mouseY<=490 && show_number==0) {
-    show_number=1;
-  }
-
-  //サポートカードの交換部分
-  for (int i=0; i<8; i++) {
-    if (support_change) {
-      if (i<6 && 150+120*i<=mouseX && mouseX<=250+120*i && 300<=mouseY && mouseY<=450) {
-        mouse_press=true;
-        support_tag=i;
-      } else if (i>=6 && 150+120*(i-4)<=mouseX && mouseX<=250+120*(i-4) && 50<=mouseY && mouseY<=200) {
-        mouse_press=true;
-        support_tag=i;
-      }
-    }
-  }
-  if(deleat_tag && 750<=mouseX && mouseX<=900 && 100<=mouseY && mouseY<=175){
-    for(int i=0;i<8;i++){
-      support_card[i]=0;
-      if(support_colortag[i]==0){
-        support_card[change_count]=support_serect[i];
-        change_count++;
-      }
-      support_colortag[i]=0;
-      support_serect[i]=0;
-    }
-    serect_count=0;
-    add_count=0;
-    change_count=0;
-    deleat_tag=false;
-    support_change=false;
-    serect_card=0;
-    show_number=0;
-    support_count=6;
-  }
+  support_do(support);
+  println(millis());
 }
