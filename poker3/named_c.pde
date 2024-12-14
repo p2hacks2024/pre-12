@@ -44,3 +44,11 @@ boolean end_button = false;//endボタンの判定
 boolean turn_end_button = false;//ターン終了判定
 boolean change_turn = false;//交換や出すことをを一回までにする
 PImage Title, Rule, Pair, Game, Result1, Result2;//画像データ
+
+import ddf.minim.*;
+Minim minim;
+AudioPlayer bgm; // BGM用のオーディオプレイヤー
+AudioPlayer submit; // カードを出すときの音
+AudioPlayer card_change;//交換の音
+AudioPlayer start;//ゲーム開始の音
+AudioPlayer change;//交代の音
