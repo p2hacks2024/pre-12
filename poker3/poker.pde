@@ -1,6 +1,5 @@
 void setup() {
   size(960, 540);
-
   setting(all_card_num);
   Title = loadImage("TitleFlush.png");
   Rule = loadImage("ルール .png");
@@ -8,8 +7,24 @@ void setup() {
   Game = loadImage("poker_bord.png");
   Result1 = loadImage("P2LOSE_P1WIN.png");
   Result2 = loadImage("P1LOSE_P2WIN.png");
+  minim = new Minim(this);
+
+  // BGMと効果音のファイルを読み込み
+  bgm = minim.loadFile("ShotGlass.mp3");//BGM
+  submit = minim.loadFile("トランプ・カードをはじく音.mp3"); //交換やペアを出したりする音
+  start = minim.loadFile("トランプ・カードを配る音.mp3"); //ゲームを始めるときの音
+  change = minim.loadFile("卓上ベル・カウンターベル.mp3"); //交代するときの音
+  card_change = minim.loadFile("トランプ・カードをめくる音.mp3"); //カードの交換の音
+  // BGMの音量設定（0から1）
+  bgm.setVolume(0.5);
+  // BGMの再生
+  bgm.loop(); // ループ再生
 }
 void draw() {
+  if (!bgm.isPlaying()) {
+    bgm.rewind(); // BGMを先頭に戻す
+    bgm.play(); // 再生
+  }
   //タイトル画面
   if (scene==0) {
     image(Title, 0, 0);
@@ -28,6 +43,15 @@ void draw() {
     fill(0);
     text(which_player, 830, 400);
 
+    if (which_player==1) {
+      fill(255, 255, 0);
+      text("FLUSH", 10, 240);
+      text(win_point_p1, 55, 280);
+    } else {
+      fill(255, 255, 0);
+      text("FLUSH", 10, 240);
+      text(win_point_p2, 55, 280);
+    }
     //ターン終了ボタンの位置
     fill(255);
     rect(845, 420, 100, 100);
@@ -42,7 +66,6 @@ void draw() {
       text("Yes", 310, 270);
       text("No", 610, 270);
     }
-
 
 
     //ここからヘルプ表示
@@ -150,7 +173,6 @@ void draw() {
             textSize(40);
             text("deleat", 775, 150);
           }
-
         }
       }
     }
@@ -204,12 +226,15 @@ void draw() {
   }
 }
 
+
 //画面選択
 void mousePressed() {
   //タイトル画面出のボタン操作
   if (scene==0) {
     if (380<=mouseX && 200<=mouseY&& 580>=mouseX && 300>=mouseY) {
       scene=1;
+      start.rewind(); // 交代の音を先頭に戻す
+      start.play(); // 交代の音再生
     }
     if (380<=mouseX && 390<=mouseY&& 580>=mouseX && 490>=mouseY) {
       scene=2;
@@ -225,6 +250,8 @@ void mousePressed() {
     if (end_button == true && 260<=mouseX && 410>=mouseX && 210<=mouseY && 310>=mouseY) {
       end_button = false;
       if (which_player == 1) {
+        change.rewind(); // 交代の音を先頭に戻す
+        change.play(); // 交代の音再生
         which_player = 2;
         support_count1=support_count;
         support_count=support_count2;
@@ -235,6 +262,8 @@ void mousePressed() {
           support_card[i]=support_card_p2[i];
         }
       } else {
+        change.rewind(); // 交代の音を先頭に戻す
+        change.play(); // 交代の音再生
         which_player = 1;
         support_count2=support_count;
         support_count=support_count1;
@@ -258,12 +287,13 @@ void mousePressed() {
 
     //カード選択
     //p1用
-
     for (int i=0; i<7; i++) {
       if (!support_change && show_number==0) {
         if ((card_x[i]<=mouseX && mouseX<=card_x[i]+80)&&(card_y[i]<=mouseY && mouseY<=card_y[i]+120)) {
           mouse_press=true;
           serect_card=i;
+          submit.rewind(); // カードの出す音を先頭に戻す
+          submit.play(); // カードの出す音再生
         }
       }
     }
@@ -274,22 +304,29 @@ void mousePressed() {
     //カードの引き直し部分
     if (750<=mouseX && mouseX<=900 && 270<=mouseY && mouseY<=345 &&show_number==0) {
       card_change();
+      card_change.rewind(); // カードの交換音を先頭に戻す
+      card_change.play(); // カードの交換音再生
     }
 
     //役の確定
     if (750<=mouseX && mouseX<=900 && 175<=mouseY && mouseY<=250 && show_number==0) {
       submit();
+      card_change.rewind(); // カードの交換音を先頭に戻す
+      card_change.play(); // カードの交換音再生
     }
-
 
     //サポートカードの表示（消し）
     if (25<=mouseX && mouseX<135 && 50<=mouseY && mouseY<=120 && show_number==1 && !support_change) {
       show_number=0;
+      submit.rewind(); // カードの出す音を先頭に戻す
+      submit.play(); // カードの出す音再生
     }
 
     //サポートカードの表示（付け）
     if (25<=mouseX && mouseX<=95 && 380<=mouseY && mouseY<=490 && show_number==0) {
       show_number=1;
+      submit.rewind(); // カードの出す音を先頭に戻す
+      submit.play(); // カードの出す音再生
     }
 
     //サポートカードの交換部分
@@ -300,9 +337,13 @@ void mousePressed() {
           if (i<6 && 150+120*i<=mouseX && mouseX<=250+120*i && 300<=mouseY && mouseY<=450) {
             mouse_press=true;
             support_tag=i;
+            submit.rewind(); // カードの出す音を先頭に戻す
+            submit.play(); // カードの出す音再生
           } else if (i>=6 && 150+120*(i-4)<=mouseX && mouseX<=250+120*(i-4) && 50<=mouseY && mouseY<=200) {
             mouse_press=true;
             support_tag=i;
+            submit.rewind(); // カードの出す音を先頭に戻す
+            submit.play(); // カードの出す音再生
           }
         }
       }
@@ -314,9 +355,13 @@ void mousePressed() {
           if (i<6 && 150+120*i<=mouseX && mouseX<=250+120*i && 300<=mouseY && mouseY<=450) {
             mouse_press=true;
             support_tag=i;
+            submit.rewind(); // カードの出す音を先頭に戻す
+            submit.play(); // カードの出す音再生
           } else if (i>=6 && 150+120*(i-4)<=mouseX && mouseX<=250+120*(i-4) && 50<=mouseY && mouseY<=200) {
             mouse_press=true;
             support_tag=i;
+            submit.rewind(); // カードの出す音を先頭に戻す
+            submit.play(); // カードの出す音再生
           }
         }
       }
@@ -384,11 +429,5 @@ void mousePressed() {
     if (380<=mouseX && 200<=mouseY&& 580>=mouseX && 300>=mouseY) {
       scene=0;
     }
-    add_count=0;
-    change_count=0;
-    deleat_tag=false;
-    support_change=false;
-    serect_card=0;
-    show_number=0;
   }
 }
